@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { cancelSpeech } from '../utils/audioUtils';
+import { cancelSpeech } from '../utils/speechUtils';
 
 /**
  * Custom hook for cleaning up speech synthesis when component unmounts
