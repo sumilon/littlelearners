@@ -1,0 +1,81 @@
+{
+  "name": "Little Learners - Kids Learning App",
+  "short_name": "Little Learners",
+  "description": "An interactive educational app for children with 26 fun learning modules covering Math, Language, Science, Geography, and more!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8b5cf6",
+  "orientation": "any",
+  "categories": ["education", "kids", "learning"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-apple-touch.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Little Learners Home Screen"
+    },
+    {
+      "src": "/screenshot-narrow.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Little Learners Mobile View"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Math Module",
+      "short_name": "Math",
+      "description": "Practice math with fun activities",
+      "url": "/?module=maths",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "English Module",
+      "short_name": "English",
+      "description": "Learn English letters and words",
+      "url": "/?module=english",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Parent Dashboard",
+      "short_name": "Dashboard",
+      "description": "View learning progress",
+      "url": "/?screen=dashboard",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
