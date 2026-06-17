@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Volume2, VolumeX, Sparkles } from 'lucide-react';
 import useStore from '../../../../store/useStore';
-import { playSound } from '../../../../utils/audioUtils';
+import { playSound, getSharedAudioContext } from '../../../../utils/audioUtils';
 import { fadeIn, scaleIn } from '../../../../utils/animationUtils';
 import { pianoKeys } from '../../../../data/miniPianoData';
 
@@ -11,32 +11,27 @@ const FreePlayTab = () => {
   const [notesPlayed, setNotesPlayed] = useState(0);
   const [showLabels, setShowLabels] = useState(true);
   const [activeKey, setActiveKey] = useState(null);
-  const audioContextRef = useRef(null);
-
-  useEffect(() => {
-    audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-    return () => {
-      if (audioContextRef.current) audioContextRef.current.close();
-    };
-  }, []);
 
   const playPianoNote = (frequency, duration = 500) => {
-    if (!audioContextRef.current) return;
+    if (!useStore.getState().soundEnabled) return;
+    try {
+      const ctx = getSharedAudioContext();
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
 
-    const oscillator = audioContextRef.current.createOscillator();
-    const gainNode = audioContextRef.current.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
 
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContextRef.current.destination);
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
+      gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration / 1000);
 
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(frequency, audioContextRef.current.currentTime);
-
-    gainNode.gain.setValueAtTime(0.3, audioContextRef.current.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContextRef.current.currentTime + duration / 1000);
-
-    oscillator.start(audioContextRef.current.currentTime);
-    oscillator.stop(audioContextRef.current.currentTime + duration / 1000);
+      oscillator.start(ctx.currentTime);
+      oscillator.stop(ctx.currentTime + duration / 1000);
+    } catch (error) {
+      console.error('Error playing piano note:', error);
+    }
   };
 
   const handleKeyPress = (key) => {
