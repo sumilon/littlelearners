@@ -1,5 +1,7 @@
 // Web Audio API utilities for sound effects
 
+import useStore from '../store/useStore';
+
 let audioContext = null;
 
 // Initialize AudioContext lazily (required for user interaction)
@@ -10,8 +12,13 @@ const getAudioContext = () => {
   return audioContext;
 };
 
+// Exported for modules that need direct Web Audio access (e.g. Mini Piano)
+// Always returns the singleton — no extra contexts created
+export const getSharedAudioContext = () => getAudioContext();
+
 // Play a tone with specified parameters
 export const playTone = (frequency, duration, type = 'sine', volume = 0.3) => {
+  if (!useStore.getState().soundEnabled) return;
   try {
     const ctx = getAudioContext();
     const oscillator = ctx.createOscillator();
