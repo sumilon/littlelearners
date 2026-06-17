@@ -1,5 +1,7 @@
 // Web Speech API utilities for text-to-speech
 
+import useStore from '../store/useStore';
+
 // Cache for loaded voices
 let voicesLoaded = false;
 let availableVoices = [];
@@ -36,6 +38,7 @@ export const cancelSpeech = () => {
 
 // Speak text in Hindi
 export const speakHindi = async (text, rate = 0.8) => {
+  if (!useStore.getState().soundEnabled) return;
   if (!('speechSynthesis' in window)) {
     console.warn('Speech synthesis not supported');
     return;
@@ -68,6 +71,7 @@ export const speakHindi = async (text, rate = 0.8) => {
 
 // Speak text in English
 export const speakEnglish = async (text, rate = 0.8) => {
+  if (!useStore.getState().soundEnabled) return;
   if (!('speechSynthesis' in window)) {
     console.warn('Speech synthesis not supported');
     return;
@@ -98,6 +102,7 @@ export const speakEnglish = async (text, rate = 0.8) => {
 
 // Speak with custom language
 export const speak = async (text, lang = 'en-IN', rate = 0.8) => {
+  if (!useStore.getState().soundEnabled) return;
   if (!('speechSynthesis' in window)) {
     console.warn('Speech synthesis not supported');
     return;
