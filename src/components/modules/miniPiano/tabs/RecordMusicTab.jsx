@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Mic, StopCircle, Play, Save, Trash2, Sparkles } from 'lucide-react';
 import useStore from '../../../../store/useStore';
-import { playSound } from '../../../../utils/audioUtils';
+import { playSound, getSharedAudioContext } from '../../../../utils/audioUtils';
 import { speakEnglish } from '../../../../utils/speechUtils';
 import { fadeIn, scaleIn, wiggle } from '../../../../utils/animationUtils';
 import { pianoKeys } from '../../../../data/miniPianoData';
@@ -14,33 +14,28 @@ const RecordMusicTab = () => {
   const [savedRecordings, setSavedRecordings] = useState([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playingIndex, setPlayingIndex] = useState(null);
-  const audioContextRef = useRef(null);
   const recordingStartTime = useRef(null);
 
-  useEffect(() => {
-    audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-    return () => {
-      if (audioContextRef.current) audioContextRef.current.close();
-    };
-  }, []);
-
   const playPianoNote = (frequency, duration = 500) => {
-    if (!audioContextRef.current) return;
+    if (!useStore.getState().soundEnabled) return;
+    try {
+      const ctx = getSharedAudioContext();
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
 
-    const oscillator = audioContextRef.current.createOscillator();
-    const gainNode = audioContextRef.current.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
 
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContextRef.current.destination);
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
+      gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration / 1000);
 
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(frequency, audioContextRef.current.currentTime);
-
-    gainNode.gain.setValueAtTime(0.3, audioContextRef.current.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContextRef.current.currentTime + duration / 1000);
-
-    oscillator.start(audioContextRef.current.currentTime);
-    oscillator.stop(audioContextRef.current.currentTime + duration / 1000);
+      oscillator.start(ctx.currentTime);
+      oscillator.stop(ctx.currentTime + duration / 1000);
+    } catch (error) {
+      console.error('Error playing piano note:', error);
+    }
   };
 
   const handleStartRecording = () => {
