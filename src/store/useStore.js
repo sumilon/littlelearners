@@ -98,12 +98,14 @@ const useStore = create((set, get) => ({
 
   // Activity Log (for parent dashboard)
   activityLog: [],
-  logActivity: (activity) => {
+  logActivity: (module, action, description) => {
     set((state) => ({
       activityLog: [
-        ...state.activityLog,
+        ...state.activityLog.slice(-99), // cap in-memory log at 100 entries
         {
-          ...activity,
+          module,
+          action,
+          description,
           timestamp: Date.now(),
         },
       ],
@@ -113,7 +115,14 @@ const useStore = create((set, get) => ({
 
   // Settings
   soundEnabled: true,
-  toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),
+  toggleSound: () => {
+    const willMute = get().soundEnabled; // currently on → toggling to off
+    if (willMute && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    set((state) => ({ soundEnabled: !state.soundEnabled }));
+    get().persist(); // persist the new sound preference immediately
+  },
 
   // Persistence
   hydrate: () => {
@@ -169,6 +178,7 @@ const useStore = create((set, get) => ({
       artDrawn: 0,
       unlockedBadges: [],
       activityLog: [],
+      soundEnabled: true,
       currentScreen: 'home',
     });
     localStorage.removeItem('littlelearners-data');
