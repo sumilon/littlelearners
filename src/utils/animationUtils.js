@@ -50,12 +50,29 @@ export const wrongVariants = {
 };
 
 // Star fly animation (from answer to header)
-export const starFlyVariants = {
+// Returns a new variant object each call so x is randomised per star
+export const getStarFlyVariants = () => ({
   initial: { scale: 0, y: 0, x: 0, opacity: 1 },
   animate: {
     scale: [0, 1.5, 0],
     y: -400,
     x: Math.random() * 200 - 100,
+    opacity: [1, 1, 0],
+    transition: {
+      duration: 1,
+      ease: 'easeOut',
+    },
+  },
+});
+
+// Keep the static export for any existing code that destructures starFlyVariants directly;
+// x will be fixed at 0 in that case — callers should migrate to getStarFlyVariants().
+export const starFlyVariants = {
+  initial: { scale: 0, y: 0, x: 0, opacity: 1 },
+  animate: {
+    scale: [0, 1.5, 0],
+    y: -400,
+    x: 0,
     opacity: [1, 1, 0],
     transition: {
       duration: 1,
