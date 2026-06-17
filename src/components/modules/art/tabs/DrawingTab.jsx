@@ -21,17 +21,45 @@ const DrawingTab = () => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (canvas) {
+    if (!canvas) return;
+
+    const initCanvas = (width, height) => {
+      // Save existing drawing before resizing
       const ctx = canvas.getContext('2d');
-      // Set canvas size
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-      // Set white background
+      const imageData = canvas.width > 0 && canvas.height > 0
+        ? ctx.getImageData(0, 0, canvas.width, canvas.height)
+        : null;
+
+      canvas.width = width;
+      canvas.height = height;
+
+      // Restore white background
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
+
+      // Restore previous drawing if any
+      if (imageData) {
+        ctx.putImageData(imageData, 0, 0);
+      }
+    };
+
+    // Set initial size
+    initCanvas(canvas.offsetWidth, canvas.offsetHeight);
+
+    // Watch for container size changes (rotation, window resize)
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        if (width > 0 && height > 0) {
+          initCanvas(Math.round(width), Math.round(height));
+        }
+      }
+    });
+    observer.observe(canvas);
 
     speakEnglish(`Let's draw! ${currentPrompt.prompt}`);
+
+    return () => observer.disconnect();
   }, []);
 
   const startDrawing = (e) => {
